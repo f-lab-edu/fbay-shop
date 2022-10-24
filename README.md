@@ -22,7 +22,6 @@
 
 ## ✅ **주요 기능**
 
-&nbsp;
 
 * 판매자 상품 등록(경매 시작가, 즉시 구매가)
 * 판매 중인 상품 조회 및 검색
@@ -38,11 +37,20 @@
 &nbsp;  
 &nbsp;  
 
-## 💾 ERD 설계
+## 🪛 프로토타입
+
+> [모바일 웹 프로토타입(https://ovenapp.io/view/CyqrK6XappezQizxTUVSHCBK4bUXlc8F#Xqs5D)](https://ovenapp.io/view/CyqrK6XappezQizxTUVSHCBK4bUXlc8F#Xqs5D)      
+
 
 &nbsp;
 
-<img width="960" alt="스크린샷 2022-10-23 오후 9 31 55" src="https://user-images.githubusercontent.com/44764521/197401767-ab280afc-d9e1-4be0-b06c-119fb80d5b31.png">
+## 💾 ERD 설계
+
+### 전체 ERD
+
+<img width="851" alt="전체 ERD" src="https://user-images.githubusercontent.com/44764521/197506062-2895a75e-a520-4913-acd3-2ce080af2983.png">
+
+자세한 내용은 [Wiki - 03. ERD](https://github.com/f-lab-edu/fbay-shop/wiki/03.-ERD) 문서 참고
 
 &nbsp;
 &nbsp;
