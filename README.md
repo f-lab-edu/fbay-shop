@@ -48,7 +48,7 @@
 
 ### 전체 ERD
 
-<img width="851" alt="전체 ERD" src="https://user-images.githubusercontent.com/44764521/197506062-2895a75e-a520-4913-acd3-2ce080af2983.png">
+<img width="950" alt="스크린샷 2022-11-01 오후 9 09 09" src="https://user-images.githubusercontent.com/44764521/199229330-22c07bb3-064b-4393-b1e6-701dbdca9ad9.png">
 
 자세한 내용은 [Wiki - 03. ERD](https://github.com/f-lab-edu/fbay-shop/wiki/03.-ERD) 문서 참고
 
