@@ -27,7 +27,6 @@
 * 판매 중인 상품 조회 및 검색
 * 실시간 경매 진행, 구매자 경매 입찰(자동 입찰, 단발 입찰)
 * 상품 즉시 구매
-* 가격 제의, 거절에 따른 재협상
 * 상품 구매, 판매 내역 조회
 
 &nbsp;  
@@ -48,7 +47,7 @@
 
 ### 전체 ERD
 
-<img width="950" alt="스크린샷 2022-11-01 오후 9 09 09" src="https://user-images.githubusercontent.com/44764521/199229330-22c07bb3-064b-4393-b1e6-701dbdca9ad9.png">
+<img width="1000" alt="전체 ERD" src="https://user-images.githubusercontent.com/44764521/201602315-0cc25935-900e-46e1-b36f-775ec33a1a85.png">
 
 자세한 내용은 [Wiki - 03. ERD](https://github.com/f-lab-edu/fbay-shop/wiki/03.-ERD) 문서 참고
 
