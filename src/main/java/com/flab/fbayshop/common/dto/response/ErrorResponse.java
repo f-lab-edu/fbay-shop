@@ -4,6 +4,8 @@ import java.io.Serializable;
 
 import org.springframework.http.ResponseEntity;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.flab.fbayshop.error.dto.ErrorType;
 
 import lombok.Getter;
@@ -15,14 +17,19 @@ public class ErrorResponse implements Serializable {
 
     private final String message;
 
-    private ErrorResponse(int code, String message) {
+    @JsonCreator
+    private ErrorResponse(@JsonProperty("code") int code, @JsonProperty("messages") String message) {
         this.code = code;
         this.message = message;
     }
 
     public static ResponseEntity<ErrorResponse> error(ErrorType errorType) {
+        return error(errorType, errorType.getMessage());
+    }
+
+    public static ResponseEntity<ErrorResponse> error(ErrorType errorType, String message) {
         return ResponseEntity.status(errorType.getStatus())
-            .body(new ErrorResponse(errorType.getCode(), errorType.getMessage()));
+            .body(new ErrorResponse(errorType.getCode(), message));
     }
 
 }
