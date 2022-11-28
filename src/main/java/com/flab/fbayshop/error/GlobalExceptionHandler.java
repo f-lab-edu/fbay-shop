@@ -1,10 +1,17 @@
 package com.flab.fbayshop.error;
 
+import static com.flab.fbayshop.error.dto.ErrorType.*;
+
 import javax.servlet.http.HttpServletRequest;
 
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.BindException;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
 import com.flab.fbayshop.common.dto.response.ErrorResponse;
@@ -17,6 +24,32 @@ import lombok.extern.slf4j.Slf4j;
 @RestControllerAdvice
 public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
+    /**
+     * 바인드 예외 핸들링
+     */
+    @Override
+    protected ResponseEntity<Object> handleBindException(BindException exception, HttpHeaders headers, HttpStatus status,
+        WebRequest request) {
+        if (!exception.getBindingResult().hasErrors()) {
+            return super.handleBindException(exception, headers, status, request);
+        }
+
+        String firstMessage = exception.getBindingResult().getAllErrors().get(0).getDefaultMessage();
+        log.error("BindException : {} | {}", firstMessage, request.getContextPath());
+        return ResponseEntity.badRequest().body(ErrorResponse.error(INVALID_PARAMETER, firstMessage).getBody());
+    }
+
+    @Override
+    protected ResponseEntity<Object> handleMethodArgumentNotValid(MethodArgumentNotValidException exception, HttpHeaders headers, HttpStatus status,
+        WebRequest request) {
+        if (!exception.getBindingResult().hasErrors()) {
+            return super.handleBindException(exception, headers, status, request);
+        }
+
+        String firstMessage = exception.getBindingResult().getAllErrors().get(0).getDefaultMessage();
+        log.error("MethodArgumentNotValidException : {} | {}", firstMessage, request.getContextPath());
+        return ResponseEntity.badRequest().body(ErrorResponse.error(INVALID_PARAMETER, firstMessage).getBody());
+    }
 
     @ExceptionHandler(BusinessException.class)
     protected ResponseEntity<ErrorResponse> handleBusinessException(final BusinessException exception,

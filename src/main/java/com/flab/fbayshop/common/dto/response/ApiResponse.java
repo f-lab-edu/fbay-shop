@@ -6,6 +6,9 @@ import java.net.URI;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import lombok.Getter;
 
 @Getter
@@ -17,7 +20,9 @@ public class ApiResponse<T> implements Serializable {
 
 	private final T data;
 
-	private ApiResponse(int code, T data, String message) {
+	@JsonCreator
+	private ApiResponse(@JsonProperty("code") int code, @JsonProperty("data") T data,
+		@JsonProperty("messages") String message) {
 		this.code = code;
 		this.message = message;
 		this.data = data;
