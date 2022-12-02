@@ -37,16 +37,7 @@ public class ApiResponse<T> implements Serializable {
 	}
 
 	public static <T> ResponseEntity<ApiResponse> created(T data) {
-		return ApiResponse.created(data, "", "");
-	}
-
-	public static <T> ResponseEntity<ApiResponse> created(T data, String message) {
-		return ApiResponse.created(data, message, "");
-	}
-
-	public static <T> ResponseEntity<ApiResponse> created(T data, String message, String uriStr) {
-		return ResponseEntity.created(URI.create(uriStr))
-			.body(new ApiResponse(HttpStatus.CREATED.value(), data, message));
+		return ResponseEntity.status(HttpStatus.CREATED).body(new ApiResponse<>(HttpStatus.CREATED.value(), data, ""));
 	}
 
 }
