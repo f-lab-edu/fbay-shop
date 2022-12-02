@@ -2,7 +2,6 @@ package com.flab.fbayshop.auth.filter;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
-import java.util.List;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -21,7 +20,6 @@ import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StreamUtils;
 import org.springframework.util.StringUtils;
-import org.springframework.web.server.MethodNotAllowedException;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.flab.fbayshop.auth.dto.UserInfo;
@@ -48,11 +46,11 @@ public class CustomAuthenticationProcessingFilter extends AbstractAuthentication
         AuthenticationException, IOException, ServletException {
 
         if (!HttpMethod.POST.matches(request.getMethod())) {
-            throw new MethodNotAllowedException(request.getMethod(), List.of(HttpMethod.POST));
+            throw new CustomAuthenticationException();
         }
-        if (!request.getContentType().equals(MediaType.APPLICATION_JSON_VALUE)) {
-            // throw new InvalidContentTypeException("지원하지 않는 요청타입입니다.");
-            throw new CustomAuthenticationException("지원하지 않는 요청타입입니다.");
+
+        if (!MediaType.APPLICATION_JSON_VALUE.equals(request.getContentType())) {
+            throw new CustomAuthenticationException();
         }
 
         UserInfo userInfo = objectMapper.readValue(
@@ -62,7 +60,7 @@ public class CustomAuthenticationProcessingFilter extends AbstractAuthentication
         String password = userInfo.getPassword();
 
         if (!StringUtils.hasText(email) || !StringUtils.hasText(password)) {
-            throw new CustomAuthenticationException("이메일 또는 비밀번호가 잘못 입력되었습니다.");
+            throw new CustomAuthenticationException();
         }
 
         UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(new CustomUserDetails(userInfo.toModel()), password);
