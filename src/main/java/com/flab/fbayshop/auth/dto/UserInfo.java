@@ -1,7 +1,5 @@
 package com.flab.fbayshop.auth.dto;
 
-import java.io.Serializable;
-
 import com.flab.fbayshop.user.model.User;
 
 import lombok.AllArgsConstructor;
@@ -13,7 +11,7 @@ import lombok.ToString;
 @ToString
 @NoArgsConstructor
 @AllArgsConstructor
-public class UserInfo implements Serializable {
+public class UserInfo {
 
     private Long id;
     private String email;
