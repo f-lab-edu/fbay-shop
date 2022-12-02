@@ -2,3 +2,10 @@
 spring:
   profiles:
     active: local # prod # test
+    include: oauth
+
+  jackson:
+    property-naming-strategy: SNAKE_CASE
+
+  main:
+    allow-bean-definition-overriding: true
