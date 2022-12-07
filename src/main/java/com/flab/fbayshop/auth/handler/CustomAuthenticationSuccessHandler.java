@@ -32,7 +32,7 @@ public class CustomAuthenticationSuccessHandler extends SimpleUrlAuthenticationS
         response.setContentType(MediaType.APPLICATION_JSON_VALUE);
         response.setCharacterEncoding(StandardCharsets.UTF_8.name());
 
-        String result = objectMapper.writeValueAsString(ApiResponse.ok(true, "로그인에 성공하였습니다.").getBody());
+        String result = objectMapper.writeValueAsString(ApiResponse.ok(true).getBody());
         response.getWriter().print(result);
 
     }

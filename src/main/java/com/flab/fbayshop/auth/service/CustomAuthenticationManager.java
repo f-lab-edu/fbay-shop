@@ -32,7 +32,8 @@ public class CustomAuthenticationManager implements AuthenticationManager {
         CustomUserDetails userDetails = userDetailsService.loadUserByUsername(getDetails.getUsername());
 
         if (!passwordEncoder.matches((String)authentication.getCredentials(), userDetails.getPassword())) {
-            throw new CustomAuthenticationException("아이디 또는 비밀번호가 잘못 입력되었습니다.");
+            log.error("로그인 실패 >> 비밀번호 불일치");
+            throw new CustomAuthenticationException();
         }
 
         return new UsernamePasswordAuthenticationToken(userDetails, userDetails.getPassword(),

@@ -2,7 +2,6 @@ package com.flab.fbayshop.user.controller;
 
 import javax.validation.Valid;
 
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -30,20 +29,15 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 public class UserController {
 
-    @Value("${server.api.url:}")
-    private String serverUrl;
-
-    private static final String PROFILE_API_PATH = "/api/v1/user";
     private final UserService userService;
 
     @PostMapping
-    public ResponseEntity<?> signupUser(@Valid @RequestBody UserSignupRequest request) {
-        return ApiResponse.created(UserDetailResponse.of(userService.signupUser(request)), "회원가입이 완료되었습니다.",
-            serverUrl + PROFILE_API_PATH);
+    public ResponseEntity<ApiResponse> signupUser(@Valid @RequestBody UserSignupRequest request) {
+        return ApiResponse.created(UserDetailResponse.of(userService.signupUser(request)));
     }
 
     @GetMapping
-    public ResponseEntity<?> getUserProfile(@AuthUser UserInfo userInfo) {
+    public ResponseEntity<ApiResponse> getUserProfile(@AuthUser UserInfo userInfo) {
         if (userInfo == null) {
             throw new UnAuthorizedException();
         }
@@ -51,16 +45,15 @@ public class UserController {
     }
 
     @PutMapping
-    public ResponseEntity<?> modifyUser(@AuthUser UserInfo userInfo, @Valid @RequestBody UserModifyRequest request) {
+    public ResponseEntity<ApiResponse> modifyUser(@AuthUser UserInfo userInfo, @Valid @RequestBody UserModifyRequest request) {
         if (userInfo == null) {
             throw new UnAuthorizedException();
         }
-        return ApiResponse.created(UserDetailResponse.of(userService.modifyUser(userInfo.getId(), request)), "회원정보가 수정되었습니다.",
-            serverUrl + PROFILE_API_PATH);
+        return ApiResponse.created(UserDetailResponse.of(userService.modifyUser(userInfo.getId(), request)));
     }
 
     @GetMapping("/email-exists")
-    public ResponseEntity<?> isExistsEmail(@RequestParam(required = false, value = "email") String email) {
+    public ResponseEntity<ApiResponse> isExistsEmail(@RequestParam(required = false, value = "email") String email) {
         return ApiResponse.ok(userService.isExistsEmail(email));
     }
 }

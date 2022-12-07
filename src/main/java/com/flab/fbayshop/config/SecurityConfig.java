@@ -64,16 +64,7 @@ public class SecurityConfig {
             .anyRequest().authenticated()
 
             .and()
-            // .formLogin().disable()
-            // .and()
             .addFilterBefore(authenticationProcessingFilter, UsernamePasswordAuthenticationFilter.class)
-
-            // .loginPage("/api/v1/login")
-            // .usernameParameter("email")
-            // .passwordParameter("password")
-            // .successHandler(successHandler)
-            // .and()
-            // .userDetailsService(userDetailsService)
 
             .build();
     }

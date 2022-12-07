@@ -1,5 +1,7 @@
 package com.flab.fbayshop.user.service;
 
+import static com.flab.fbayshop.error.dto.ErrorType.*;
+
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -37,7 +39,7 @@ public class UserService {
     public User signupUser(UserSignupRequest request) {
 
         if (userMapper.isExistsEmail(request.getEmail())) {
-            throw new UserDuplicatedException("중복된 이메일이 존재합니다.");
+            throw new UserDuplicatedException();
         }
 
         User saveUser = request.toEntity(passwordEncoder.encode(request.getPassword()));
@@ -45,7 +47,7 @@ public class UserService {
         int res = userMapper.insertUser(saveUser);
 
         if (res != 1) {
-            throw new UserProcessException("회원가입 중 오류가 발생하였습니다.");
+            throw new UserProcessException(USER_SIGNUP_FAIL);
         }
 
         return saveUser;
@@ -64,7 +66,7 @@ public class UserService {
         int res = userMapper.updateUser(saveUser.modify(request.toEntity()));
 
         if (res != 1) {
-            throw new UserProcessException("회원정보 수정 중 오류가 발생하였습니다.");
+            throw new UserProcessException(USER_MODIFY_FAIL);
         }
 
         return saveUser;

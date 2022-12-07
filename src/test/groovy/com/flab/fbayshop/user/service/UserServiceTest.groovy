@@ -24,8 +24,9 @@ class UserServiceTest extends Specification {
 
         given:
         UserSignupRequest request = new UserSignupRequest("test@t.c", "1234", "테스트1", "테스트1")
+        String encodedPassword = "QWENIQWOENOQIWNE"
         userMapper.isExistsEmail(request.getEmail()) >> false
-        passwordEncoder.encode(request.getPassword()) >> "qwerty"
+        passwordEncoder.encode(request.getPassword()) >> encodedPassword
         userMapper.insertUser(_) >> 1
 
         when:
@@ -35,6 +36,7 @@ class UserServiceTest extends Specification {
         println user
         user != null
         user.getName() == request.getName()
+        user.getPassword() == encodedPassword
         user.getEmail() == request.getEmail()
         user.getNickname() == request.getNickname()
 
@@ -53,56 +55,6 @@ class UserServiceTest extends Specification {
         thrown(UserDuplicatedException)
 
     }
-
-//    시큐리티 로그인 사용
-//    def "이메일 로그인 - 성공"() {
-//        given:
-//        UserLoginRequest request = new UserLoginRequest("test@t.c", "1234")
-//        String encodedPw = "qwrqwer"
-//        userMapper.findByEmail(request.getEmail()) >> Optional.of(User.builder().email(request.getEmail()).password(encodedPw).build())
-//        passwordEncoder.matches(request.getPassword(), encodedPw) >> true
-//        MockHttpSession session = new MockHttpSession();
-//
-//        when:
-//        boolean result = userService.loginUser(request, session)
-//
-//        then:
-//        result == true
-//        SessionUtils.getSession(session).getUserInfo().getEmail() == request.getEmail()
-//    }
-//
-//    def "이메일 로그인 - 실패(비밀번호 오류)"() {
-//        given:
-//        UserLoginRequest request = new UserLoginRequest("test@t.c", "1234")
-//        String encodedPw = "qwrqwer"
-//        userMapper.findByEmail(request.getEmail()) >> Optional.of(User.builder().email(request.getEmail()).password(encodedPw).build())
-//        passwordEncoder.matches(request.getPassword(), encodedPw) >> false
-//        MockHttpSession session = new MockHttpSession()
-//
-//        when:
-//        userService.loginUser(request, session)
-//
-//        then:
-//        thrown(UserLoginFailException)
-//    }
-//
-//    def "로그아웃 - 성공"() {
-//        given:
-//        UserLoginRequest request = new UserLoginRequest("test@t.c", "1234")
-//        String encodedPw = "qwrqwer"
-//        userMapper.findByEmail(request.getEmail()) >> Optional.of(User.builder().email(request.getEmail()).password(encodedPw).build())
-//        passwordEncoder.matches(request.getPassword(), encodedPw) >> true
-//        MockHttpSession session = new MockHttpSession();
-//
-//        when:
-//        boolean isLogin = userService.loginUser(request, session)
-//        boolean isLogout = userService.logoutUser(session)
-//
-//        then:
-//        isLogin == true
-//        isLogout == true
-//        SessionUtils.getSession(session) == null
-//    }
 
     def "사용자 프로필 조회 - 성공"() {
         given:
@@ -142,6 +94,7 @@ class UserServiceTest extends Specification {
         modifyUser.getUserId() == userId
         modifyUser.getName() == request.getName()
         modifyUser.getNickname() == request.getNickname()
+        modifyUser.getPassword() == savedUser.getPassword()
 
     }
 

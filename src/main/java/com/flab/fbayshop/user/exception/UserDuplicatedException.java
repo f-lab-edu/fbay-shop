@@ -10,7 +10,4 @@ public class UserDuplicatedException extends BusinessException {
         super(USER_DUPLICATED);
     }
 
-    public UserDuplicatedException(String message) {
-        super(message, USER_DUPLICATED);
-    }
 }
