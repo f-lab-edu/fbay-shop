@@ -27,12 +27,17 @@ public class PageRequest {
 
     private List<Filter> filter;    // 필터
 
+    public int getLimit() {
+        return size + 1;
+    }
+
     public static PageInfo of(int page, int size) {
         return new PageInfo(page, size);
     }
 
     public static PageInfo from(PageRequest pageRequest) {
-        return new PageInfo(pageRequest.getPage(), pageRequest.getSize(), pageRequest.getSort(), pageRequest.getFilter());
+        return new PageInfo(pageRequest.getPage(), pageRequest.getSize(), pageRequest.getSort(),
+            pageRequest.getFilter());
     }
 
 }

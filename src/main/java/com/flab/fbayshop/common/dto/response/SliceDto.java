@@ -15,23 +15,27 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class SliceDto<T> implements Serializable {
 
-    private List<T> data;
+    private List<T> items;
 
     private boolean hasNext;
 
-    public static <T> SliceDto of(List<T> data, PageRequest request) {
+    private Long nextCursor;
+
+    public static <T extends PageResponse> SliceDto<T> of(List<T> data, PageRequest request) {
 
         if (data == null || data.size() == 0) {
-            return new SliceDto<>(new ArrayList<>(), false);
+            return new SliceDto<>(new ArrayList<>(), false, null);
         }
 
         boolean hasNext = false;
+        Long nextCursor = null;
 
         if (data.size() > request.getSize()) {
-            data.remove(request.getSize());
+            T removed = data.remove(request.getSize());
             hasNext = true;
+            nextCursor = removed.getId();
         }
 
-        return new SliceDto<>(data, hasNext);
+        return new SliceDto<>(data, hasNext, nextCursor);
     }
 }
