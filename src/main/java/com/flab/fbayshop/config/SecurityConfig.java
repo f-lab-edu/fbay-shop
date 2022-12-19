@@ -60,6 +60,7 @@ public class SecurityConfig {
 
             .antMatchers("/api/v1/login/**").permitAll()
             .antMatchers("/api/v1/user/**").permitAll()
+            .antMatchers(HttpMethod.GET, "/api/v1/product/**").permitAll()
 
             .anyRequest().authenticated()
 
