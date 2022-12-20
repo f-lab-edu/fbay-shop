@@ -23,6 +23,7 @@ public enum ErrorType {
     USER_DUPLICATED(HttpStatus.CONFLICT, 4111, "중복된 회원정보가 존재합니다."),
     USER_SIGNUP_FAIL(HttpStatus.CONFLICT, 4112, "회원가입에 실패하였습니다."),
     USER_MODIFY_FAIL(HttpStatus.CONFLICT, 4113, "회원정보 수정에 실패하였습니다."),
+    PRODUCT_NOT_FOUND(HttpStatus.NOT_FOUND, 4200, "상품 정보가 존재하지 않습니다."),
 
     /**
      * 서버 에러

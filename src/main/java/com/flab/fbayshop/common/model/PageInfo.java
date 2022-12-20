@@ -1,5 +1,7 @@
 package com.flab.fbayshop.common.model;
 
+import java.util.List;
+
 import lombok.Getter;
 import lombok.Setter;
 
@@ -13,16 +15,24 @@ public class PageInfo {
 
     private int page = 0;
 
-    private Sort sort;
+    private List<Sort> sort;
+
+    private List<Filter> filter;
 
     public PageInfo(int page, int size) {
         this.offset = (page - 1) * size;
         this.size = size;
     }
 
-    public PageInfo(int page, int size, Sort sort) {
+    public PageInfo(int page, int size, List<Sort> sort) {
         this(page, size);
         this.sort = sort;
+    }
+
+    public PageInfo(int page, int size, List<Sort> sort, List<Filter> filter) {
+        this(page, size);
+        this.sort = sort;
+        this.filter = filter;
     }
 }
 

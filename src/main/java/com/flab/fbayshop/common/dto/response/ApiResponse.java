@@ -1,32 +1,25 @@
 package com.flab.fbayshop.common.dto.response;
 
 import java.io.Serializable;
-import java.net.URI;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonProperty;
-
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Getter
+@NoArgsConstructor
+@AllArgsConstructor
 public class ApiResponse<T> implements Serializable {
 
-	private final int code;
+	private int code;
 
-	private final String message;
+	private T data;
 
-	private final T data;
+	private String message;
 
-	@JsonCreator
-	private ApiResponse(@JsonProperty("code") int code, @JsonProperty("data") T data,
-		@JsonProperty("messages") String message) {
-		this.code = code;
-		this.message = message;
-		this.data = data;
-	}
 
 	public static <T> ResponseEntity<ApiResponse> ok(T data) {
 		return ApiResponse.ok(data, "");

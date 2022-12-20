@@ -62,9 +62,14 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     @ExceptionHandler(Exception.class)
     protected ResponseEntity<ErrorResponse> handleException(final Exception exception,
         final HttpServletRequest request) {
-
         log.error("Exception : {} | {}", exception.getMessage(), request.getRequestURL());
         return ErrorResponse.error(ErrorType.INTERNAL_SERVER_ERROR);
     }
 
+    @Override
+    protected ResponseEntity<Object> handleExceptionInternal(Exception ex, Object body, HttpHeaders headers,
+        HttpStatus status, WebRequest request) {
+        log.error("{} : {} | {}", ex.getClass().getName(), ex.getMessage(), request.getContextPath());
+        return super.handleExceptionInternal(ex, body, headers, status, request);
+    }
 }

@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.flab.fbayshop.product.mapper.ProductMapper">
+
+    <resultMap id="productMap" type="com.flab.fbayshop.product.model.Product">
+        <id property="productId" column="id"/>
+        <result property="title" column="title"/>
+        <result property="subtitle" column="subtitle"/>
+        <result property="content" column="content"/>
+        <result property="categoryId" column="category_id"/>
+        <result property="price" column="price"/>
+        <result property="stock" column="stock"/>
+        <result property="sellPrice" column="sell_price"/>
+        <result property="createdAt" column="created_at"/>
+        <result property="updatedAt" column="updated_at"/>
+        <association property="seller" resultMap="sellerMap"></association>
+        <collection property="productTypeCodeList" javaType="java.util.List" ofType="java.lang.String">
+            <result column="purchase_type" javaType="java.lang.String" />
+        </collection>
+
+    </resultMap>
+    <resultMap id="sellerMap" type="com.flab.fbayshop.user.model.User">
+        <result property="userId" column="user_id"/>
+        <result property="nickname" column="nickname"/>
+    </resultMap>
+
+    <insert id="insertProduct" parameterType="com.flab.fbayshop.product.model.Product" useGeneratedKeys="true" keyProperty="productId">
+        INSERT INTO product (user_id, title, subtitle, content, price, sell_price, stock, category_id, created_at, updated_at)
+            VALUES (#{seller.userId}, #{title}, #{subtitle}, #{content}, #{price}, #{sellPrice}, #{stock}, #{categoryId}, NOW(), NOW())
+    </insert>
+
+    <insert id="insertProductType" parameterType="com.flab.fbayshop.product.model.Product">
+        INSERT INTO product_type(product_id, purchase_type, created_at, updated_at) VALUES
+        <foreach collection="productTypeList" item="item" separator=",">
+            (#{productId}, #{item.code}, NOW(), NOW())
+        </foreach>
+    </insert>
+
+    <select id="findProductById" parameterType="Long" resultMap="productMap">
+        SELECT
+              p.id
+            , p.title
+            , p.subtitle
+            , p.content
+            , p.price
+            , p.sell_price
+            , p.stock
+            , p.product_status
+            , p.created_at
+            , p.updated_at
+            , p.user_id
+            , u.nickname
+            , t.purchase_type
+        FROM product AS p
+        LEFT JOIN user AS u
+        ON p.user_id = u.id
+        LEFT JOIN product_type AS t
+        ON p.id = t.product_id
+        WHERE p.id = #{productId}
+    </select>
+
+    <select id="selectProductList" parameterType="com.flab.fbayshop.common.dto.request.PageRequest" resultMap="productMap">
+        SELECT
+              data.*
+            , t.purchase_type
+        FROM (
+            SELECT
+                  p.id
+                , p.title
+                , p.subtitle
+                , p.content
+                , p.price
+                , p.sell_price
+                , p.stock
+                , p.product_status
+                , p.created_at
+                , p.updated_at
+                , p.user_id
+                , u.nickname
+            FROM product AS p
+            LEFT JOIN user AS u
+            ON p.user_id = u.id
+            WHERE 1=1
+            <if test="cursor != null and cursor != ''">
+                AND p.id <![CDATA[<=]]> #{cursor}
+            </if>
+            ORDER BY p.id DESC
+            LIMIT #{limit}
+        ) AS data
+        LEFT JOIN product_type AS t
+        ON data.id = t.product_id
+    </select>
+
+</mapper>
