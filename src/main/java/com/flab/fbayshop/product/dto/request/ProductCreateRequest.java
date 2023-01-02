@@ -13,6 +13,7 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
 import com.flab.fbayshop.product.model.Product;
+import com.flab.fbayshop.product.model.ProductStatus;
 import com.flab.fbayshop.product.model.ProductType;
 import com.flab.fbayshop.user.model.User;
 
@@ -66,6 +67,7 @@ public class ProductCreateRequest {
             .categoryId(categoryId)
             .seller(seller)
             .sellPrice(this.sellPrice)
+            .productStatus(ProductStatus.SALE)
             .build();
     }
 }

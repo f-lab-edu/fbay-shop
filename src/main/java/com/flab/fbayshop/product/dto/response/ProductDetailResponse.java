@@ -40,6 +40,8 @@ public class ProductDetailResponse implements Serializable {
 
     private BigDecimal sellPrice;
 
+    private String productStatus;
+
     private String createdAt;
 
     private String updatedAt;
@@ -55,6 +57,7 @@ public class ProductDetailResponse implements Serializable {
                     .stream()
                     .map(ProductType::findByCode).collect(Collectors.toList()),
             product.getPrice(), product.getSellPrice(),
+            product.getProductStatus() == null ? null : product.getProductStatus().getCode(),
             product.getCreatedAt(),
             product.getUpdatedAt()
         );

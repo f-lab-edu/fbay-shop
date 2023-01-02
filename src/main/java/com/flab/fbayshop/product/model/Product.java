@@ -41,6 +41,8 @@ public class Product {
 
     private BigDecimal sellPrice;
 
+    private ProductStatus productStatus;
+
     private String createdAt;
 
     private String updatedAt;
@@ -48,7 +50,7 @@ public class Product {
     @Builder
     public Product(Long productId, String title, String subtitle, String content, Long categoryId,
         List<Category> categoryList, User seller, List<ProductType> productTypeList, List<String> productTypeCodeList, BigDecimal price, Integer stock,
-        BigDecimal sellPrice, String createdAt, String updatedAt) {
+        BigDecimal sellPrice, ProductStatus productStatus, String createdAt, String updatedAt) {
         this.productId = productId;
         this.title = title;
         this.subtitle = subtitle;
@@ -61,7 +63,16 @@ public class Product {
         this.price = price;
         this.stock = stock;
         this.sellPrice = sellPrice;
+        this.productStatus = productStatus;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
+    }
+
+    public void updateStatus(ProductStatus productStatus) {
+        this.productStatus = productStatus;
+    }
+
+    public void decreaseStock(int quantity) {
+        this.stock = this.stock - quantity;
     }
 }

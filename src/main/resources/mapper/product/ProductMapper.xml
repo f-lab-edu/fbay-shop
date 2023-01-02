@@ -13,13 +13,13 @@
         <result property="price" column="price"/>
         <result property="stock" column="stock"/>
         <result property="sellPrice" column="sell_price"/>
+        <result property="productStatus" column="product_status"/>
         <result property="createdAt" column="created_at"/>
         <result property="updatedAt" column="updated_at"/>
         <association property="seller" resultMap="sellerMap"></association>
         <collection property="productTypeCodeList" javaType="java.util.List" ofType="java.lang.String">
             <result column="purchase_type" javaType="java.lang.String" />
         </collection>
-
     </resultMap>
     <resultMap id="sellerMap" type="com.flab.fbayshop.user.model.User">
         <result property="userId" column="user_id"/>
@@ -27,8 +27,8 @@
     </resultMap>
 
     <insert id="insertProduct" parameterType="com.flab.fbayshop.product.model.Product" useGeneratedKeys="true" keyProperty="productId">
-        INSERT INTO product (user_id, title, subtitle, content, price, sell_price, stock, category_id, created_at, updated_at)
-            VALUES (#{seller.userId}, #{title}, #{subtitle}, #{content}, #{price}, #{sellPrice}, #{stock}, #{categoryId}, NOW(), NOW())
+        INSERT INTO product (user_id, title, subtitle, content, price, sell_price, stock, category_id, product_status, created_at, updated_at)
+            VALUES (#{seller.userId}, #{title}, #{subtitle}, #{content}, #{price}, #{sellPrice}, #{stock}, #{categoryId}, #{productStatus}, NOW(), NOW())
     </insert>
 
     <insert id="insertProductType" parameterType="com.flab.fbayshop.product.model.Product">
@@ -59,6 +59,18 @@
         LEFT JOIN product_type AS t
         ON p.id = t.product_id
         WHERE p.id = #{productId}
+    </select>
+
+    <select id="findProductByIdForUpdate" parameterType="Long" resultType="com.flab.fbayshop.product.model.Product">
+        SELECT
+              p.id AS productId
+            , p.price
+            , p.sell_price AS sellPrice
+            , p.stock
+            , p.product_status AS productStatus
+        FROM product AS p
+        WHERE p.id = #{productId}
+        FOR UPDATE
     </select>
 
     <select id="selectProductList" parameterType="com.flab.fbayshop.common.dto.request.PageRequest" resultMap="productMap">
@@ -92,5 +104,12 @@
         LEFT JOIN product_type AS t
         ON data.id = t.product_id
     </select>
+
+    <update id="updateProduct" parameterType="com.flab.fbayshop.product.model.Product">
+        UPDATE product
+        SET stock          = #{stock}
+          , product_status = #{productStatus}
+        WHERE id = #{productId}
+    </update>
 
 </mapper>

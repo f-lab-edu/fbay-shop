@@ -7,9 +7,14 @@ import com.flab.fbayshop.common.dto.response.ErrorResponse
 import com.flab.fbayshop.common.dto.response.SliceDto
 import com.flab.fbayshop.error.dto.ErrorType
 import com.flab.fbayshop.product.dto.request.ProductCreateRequest
+import com.flab.fbayshop.product.dto.request.ProductOrderRequest
 import com.flab.fbayshop.product.dto.response.ProductDetailResponse
 import com.flab.fbayshop.product.dto.response.ProductResponse
+import com.flab.fbayshop.product.exception.ProductNotFoundException
+import com.flab.fbayshop.product.exception.ProductNotSaleException
+import com.flab.fbayshop.product.exception.ProductOutOfStockException
 import com.flab.fbayshop.product.model.Product
+import com.flab.fbayshop.product.model.ProductStatus
 import com.flab.fbayshop.product.model.ProductType
 import com.flab.fbayshop.product.service.ProductService
 import com.flab.fbayshop.user.dto.request.UserSignupRequest
@@ -190,6 +195,7 @@ class ProductControllerTest extends Specification {
         sliceDto2.nextCursor == null
     }
 
+    @Transactional
     def "상품 상세 조회 - 성공"() {
         given:
         ProductCreateRequest request = new ProductCreateRequest("제목", "부제목", "내용", 10000, 1, List.of(ProductType.BUY_NOW.getCode(), ProductType.AUCTION.getCode()), 10000, 1L)
@@ -213,6 +219,7 @@ class ProductControllerTest extends Specification {
         response.getProductTypeList().size() == product.getProductTypeList().size()
     }
 
+    @Transactional
     def "상품 상세 조회 - 실패"() {
         given:
         MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.get("/api/v1/product/-1")).andReturn()
@@ -222,5 +229,87 @@ class ProductControllerTest extends Specification {
         def response = objectMapper.readValue(contentStr, ErrorResponse.class)
         response.getCode() == ErrorType.PRODUCT_NOT_FOUND.getCode()
         response.getMessage() == ErrorType.PRODUCT_NOT_FOUND.getMessage()
+    }
+
+    @Transactional
+    def "상품 재고 감소 - 성공(재고 감소)"() {
+        given:
+        Integer beforeStock = 10
+        Integer orderStock = 5
+        ProductCreateRequest createRequest = new ProductCreateRequest("제목", "부제목", "내용", 10000, beforeStock, List.of(ProductType.BUY_NOW.getCode(), ProductType.AUCTION.getCode()), 10000, 1L)
+        Product beforeProduct = productService.registProduct(user.getUserId(), createRequest)
+        ProductOrderRequest orderRequest = new ProductOrderRequest(beforeProduct.getProductId(), orderStock)
+
+        when:
+        productService.decreaseStock(orderRequest)
+        Product afterProduct = productService.getProductById(orderRequest.getProductId())
+
+        then:
+        afterProduct.getProductId() == beforeProduct.getProductId()
+        beforeProduct.getStock() == beforeStock
+        afterProduct.getStock() == beforeStock - orderStock
+        afterProduct.getProductStatus() == ProductStatus.SALE
+    }
+
+    @Transactional
+    def "상품 재고 감소 - 성공(품절)"() {
+        given:
+        Integer beforeStock = 10
+        Integer orderStock = 10
+        ProductCreateRequest createRequest = new ProductCreateRequest("제목", "부제목", "내용", 10000, beforeStock, List.of(ProductType.BUY_NOW.getCode(), ProductType.AUCTION.getCode()), 10000, 1L)
+        Product beforeProduct = productService.registProduct(user.getUserId(), createRequest)
+        ProductOrderRequest orderRequest = new ProductOrderRequest(beforeProduct.getProductId(), orderStock)
+
+        when:
+        productService.decreaseStock(orderRequest)
+        Product afterProduct = productService.getProductById(orderRequest.getProductId())
+
+        then:
+        afterProduct.getProductId() == beforeProduct.getProductId()
+        beforeProduct.getStock() == beforeStock
+        afterProduct.getStock() == 0
+        afterProduct.getProductStatus() == ProductStatus.SOLD_OUT
+    }
+
+    def "상품 재고 감소 - 실패(상품정보 없음)"() {
+
+        given:
+        ProductOrderRequest orderRequest = new ProductOrderRequest(-1L, 1)
+
+        when:
+        productService.decreaseStock(orderRequest)
+
+        then:
+        thrown(ProductNotFoundException)
+    }
+
+    def "상품 재고 감소 - 실패(재고 없음)"() {
+        given:
+        Integer beforeStock = 3
+        Integer orderStock = 5
+        ProductCreateRequest createRequest = new ProductCreateRequest("제목", "부제목", "내용", 10000, beforeStock, List.of(ProductType.BUY_NOW.getCode(), ProductType.AUCTION.getCode()), 10000, 1L)
+        Product beforeProduct = productService.registProduct(user.getUserId(), createRequest)
+        ProductOrderRequest orderRequest = new ProductOrderRequest(beforeProduct.getProductId(), orderStock)
+
+        when:
+        productService.decreaseStock(orderRequest)
+
+        then:
+        thrown(ProductOutOfStockException)
+    }
+
+    def "상품 재고 감소 - 실패(판매중X)"() {
+        given:
+        Integer beforeStock = 3
+        ProductCreateRequest createRequest = new ProductCreateRequest("제목", "부제목", "내용", 10000, beforeStock, List.of(ProductType.BUY_NOW.getCode(), ProductType.AUCTION.getCode()), 10000, 1L)
+        Product beforeProduct = productService.registProduct(user.getUserId(), createRequest)
+        ProductOrderRequest orderRequest = new ProductOrderRequest(beforeProduct.getProductId(), beforeStock)
+        productService.decreaseStock(orderRequest)
+
+        when:
+        productService.decreaseStock(orderRequest)
+
+        then:
+        thrown(ProductNotSaleException)
     }
 }
