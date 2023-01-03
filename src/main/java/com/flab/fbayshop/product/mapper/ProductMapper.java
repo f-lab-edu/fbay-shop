@@ -17,5 +17,9 @@ public interface ProductMapper {
 
     Optional<Product> findProductById(Long productId);
 
+    Optional<Product> findProductByIdForUpdate(Long productId);
+
     List<Product> selectProductList(PageRequest request);
+
+    void updateProduct(Product product);
 }

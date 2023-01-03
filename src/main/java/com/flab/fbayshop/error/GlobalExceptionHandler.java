@@ -54,15 +54,14 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     @ExceptionHandler(BusinessException.class)
     protected ResponseEntity<ErrorResponse> handleBusinessException(final BusinessException exception,
         final HttpServletRequest request) {
-
-        log.error("BusinessException : {} | {}", exception.getMessage(), request.getRequestURL());
+        log.error("BusinessException : {} | ", request.getRequestURL(), exception);
         return ErrorResponse.error(exception.getErrorType());
     }
 
     @ExceptionHandler(Exception.class)
     protected ResponseEntity<ErrorResponse> handleException(final Exception exception,
         final HttpServletRequest request) {
-        log.error("Exception : {} | {}", exception.getMessage(), request.getRequestURL());
+        log.error("Exception : {} |", request.getRequestURL(), exception);
         return ErrorResponse.error(ErrorType.INTERNAL_SERVER_ERROR);
     }
 

@@ -38,6 +38,8 @@ public class ProductResponse implements PageResponse {
 
     private BigDecimal sellPrice;
 
+    private String productStatus;
+
     public static ProductResponse of(Product product) {
         return new ProductResponse(
             product.getProductId()
@@ -53,6 +55,7 @@ public class ProductResponse implements PageResponse {
             , product.getCategoryList()
             , product.getPrice()
             , product.getSellPrice()
+            , product.getProductStatus() == null ? null : product.getProductStatus().getCode()
         );
     }
 
