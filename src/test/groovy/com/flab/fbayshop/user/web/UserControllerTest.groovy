@@ -7,6 +7,9 @@ import com.flab.fbayshop.error.dto.ErrorType
 import com.flab.fbayshop.user.controller.UserController
 import com.flab.fbayshop.user.dto.request.UserModifyRequest
 import com.flab.fbayshop.user.dto.request.UserSignupRequest
+import com.flab.fbayshop.user.exception.AddressNotFoundException
+import com.flab.fbayshop.user.exception.UserNotFoundException
+import com.flab.fbayshop.user.model.Address
 import com.flab.fbayshop.user.model.User
 import com.flab.fbayshop.user.service.UserService
 import lombok.extern.slf4j.Slf4j
@@ -36,8 +39,8 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
 
 @Slf4j
-@Transactional
 @SpringBootTest
+@Transactional
 class UserControllerTest extends Specification {
 
     @Autowired
@@ -107,9 +110,8 @@ class UserControllerTest extends Specification {
     }
 
     def "회원가입 - 성공"() {
-
         given:
-        String param1 = "{ \"email\": \"test22@t.c\"," +
+        String param1 = "{ \"email\": \"tt22@t.c\"," +
                 "\"password\": \"qwer1234!\"," +
                 "\"name\": \"테스트2\"," +
                 "\"nickname\": \"테스트2\"" +
@@ -263,4 +265,112 @@ class UserControllerTest extends Specification {
 
     }
 
+    def "사용자 주소 리스트 조회 - 성공"() {
+        given:
+        Address savedAddress = userService.registAddress(
+                Address.builder()
+                        .userId(user.getUserId())
+                        .roadAddress("도로명 주소")
+                        .jibunAddress("지번 주소")
+                        .addressDetail("주소 상세")
+                        .receiverName("주문자")
+                        .receiverContact("010-0000-0000")
+                        .zoneCode(1000)
+                        .build())
+
+        when:
+        List<Address> addressList = userService.selectAddressList(user.getUserId())
+
+        then:
+        addressList.size() == 1
+        addressList.get(0).getAddressId() == savedAddress.getAddressId()
+        addressList.get(0).getUserId() == savedAddress.getUserId()
+        addressList.get(0).getRoadAddress() == savedAddress.getRoadAddress()
+        addressList.get(0).getJibunAddress() == savedAddress.getJibunAddress()
+        addressList.get(0).getAddressDetail() == savedAddress.getAddressDetail()
+        addressList.get(0).getReceiverName() == savedAddress.getReceiverName()
+        addressList.get(0).getReceiverContact() == savedAddress.getReceiverContact()
+        addressList.get(0).getZoneCode() == savedAddress.getZoneCode()
+
+    }
+
+    def "사용자 주소 등록 - 성공"() {
+        given:
+        Address saveAddress = Address.builder()
+                .userId(user.getUserId())
+                .roadAddress("도로명 주소")
+                .jibunAddress("지번 주소")
+                .addressDetail("주소 상세")
+                .receiverName("주문자")
+                .receiverContact("010-0000-0000")
+                .zoneCode(1000)
+                .build()
+        when:
+        Address address = userService.registAddress(saveAddress)
+
+        then:
+        address.getAddressId() != null
+        address.getUserId() == saveAddress.getUserId()
+        address.getRoadAddress() == saveAddress.getRoadAddress()
+        address.getJibunAddress() == saveAddress.getJibunAddress()
+        address.getAddressDetail() == saveAddress.getAddressDetail()
+        address.getReceiverName() == saveAddress.getReceiverName()
+        address.getReceiverContact() == saveAddress.getReceiverContact()
+        address.getZoneCode() == saveAddress.getZoneCode()
+    }
+
+    def "사용자 주소 등록 - 실패(사용자 정보없음)"() {
+        given:
+        Address saveAddress = Address.builder()
+                .userId(-1L)
+                .roadAddress("도로명 주소")
+                .jibunAddress("지번 주소")
+                .addressDetail("주소 상세")
+                .receiverName("주문자")
+                .receiverContact("010-0000-0000")
+                .zoneCode(1000)
+                .build()
+
+        when:
+        userService.registAddress(saveAddress)
+
+        then:
+        thrown(UserNotFoundException)
+    }
+
+    def "사용자 주소 조회 - 성공"() {
+        given:
+        Address savedAddress = userService.registAddress(
+                Address.builder()
+                        .userId(user.getUserId())
+                        .roadAddress("도로명 주소")
+                        .jibunAddress("지번 주소")
+                        .addressDetail("상세")
+                        .receiverName("주문자")
+                        .receiverContact("010-0000-0000")
+                        .zoneCode(1000)
+                        .build())
+
+        when:
+        Address address = userService.findAddressById(savedAddress.getAddressId())
+
+        then:
+        address.getAddressId() == savedAddress.getAddressId()
+        address.getUserId() == savedAddress.getUserId()
+        address.getRoadAddress() == savedAddress.getRoadAddress()
+        address.getJibunAddress() == savedAddress.getJibunAddress()
+        address.getAddressDetail() == savedAddress.getAddressDetail()
+        address.getReceiverName() == savedAddress.getReceiverName()
+        address.getReceiverContact() == savedAddress.getReceiverContact()
+        address.getZoneCode() == savedAddress.getZoneCode()
+
+    }
+
+    def "사용자 주소 조회 - 실패(주소 정보없음)"() {
+        when:
+        userService.findAddressById(-1L)
+
+        then:
+        thrown(AddressNotFoundException)
+    }
 }
