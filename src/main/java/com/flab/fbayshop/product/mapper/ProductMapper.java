@@ -19,7 +19,11 @@ public interface ProductMapper {
 
     Optional<Product> findProductByIdForUpdate(Long productId);
 
+    List<Product> findProductsByIdsForUpdate(List<Long> productIds);
+
     List<Product> selectProductList(PageRequest request);
 
     void updateProduct(Product product);
+
+    void updateProducts(List<Product> products);
 }

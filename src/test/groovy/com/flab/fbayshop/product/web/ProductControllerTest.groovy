@@ -241,7 +241,7 @@ class ProductControllerTest extends Specification {
         ProductOrderRequest orderRequest = new ProductOrderRequest(beforeProduct.getProductId(), orderStock)
 
         when:
-        productService.decreaseStock(orderRequest)
+        productService.decreaseStock(List.of(orderRequest))
         Product afterProduct = productService.getProductById(orderRequest.getProductId())
 
         then:
@@ -261,7 +261,7 @@ class ProductControllerTest extends Specification {
         ProductOrderRequest orderRequest = new ProductOrderRequest(beforeProduct.getProductId(), orderStock)
 
         when:
-        productService.decreaseStock(orderRequest)
+        productService.decreaseStock(List.of(orderRequest))
         Product afterProduct = productService.getProductById(orderRequest.getProductId())
 
         then:
@@ -277,7 +277,7 @@ class ProductControllerTest extends Specification {
         ProductOrderRequest orderRequest = new ProductOrderRequest(-1L, 1)
 
         when:
-        productService.decreaseStock(orderRequest)
+        productService.decreaseStock(List.of(orderRequest))
 
         then:
         thrown(ProductNotFoundException)
@@ -292,7 +292,7 @@ class ProductControllerTest extends Specification {
         ProductOrderRequest orderRequest = new ProductOrderRequest(beforeProduct.getProductId(), orderStock)
 
         when:
-        productService.decreaseStock(orderRequest)
+        productService.decreaseStock(List.of(orderRequest))
 
         then:
         thrown(ProductOutOfStockException)
@@ -304,10 +304,10 @@ class ProductControllerTest extends Specification {
         ProductCreateRequest createRequest = new ProductCreateRequest("제목", "부제목", "내용", 10000, beforeStock, List.of(ProductType.BUY_NOW.getCode(), ProductType.AUCTION.getCode()), 10000, 1L)
         Product beforeProduct = productService.registProduct(user.getUserId(), createRequest)
         ProductOrderRequest orderRequest = new ProductOrderRequest(beforeProduct.getProductId(), beforeStock)
-        productService.decreaseStock(orderRequest)
+        productService.decreaseStock(List.of(orderRequest))
 
         when:
-        productService.decreaseStock(orderRequest)
+        productService.decreaseStock(List.of(orderRequest))
 
         then:
         thrown(ProductNotSaleException)
