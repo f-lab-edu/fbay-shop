@@ -16,6 +16,7 @@ import com.flab.fbayshop.product.exception.ProductOutOfStockException;
 import com.flab.fbayshop.product.mapper.ProductMapper;
 import com.flab.fbayshop.product.model.Product;
 import com.flab.fbayshop.product.model.ProductStatus;
+import com.flab.fbayshop.user.exception.UserProcessException;
 import com.flab.fbayshop.user.model.User;
 import com.flab.fbayshop.user.service.UserService;
 
@@ -58,15 +59,15 @@ public class ProductService {
     }
 
     @Transactional
-    public void decreaseStock(List<ProductOrderRequest> requests) {
+    public List<Product> decreaseStock(List<ProductOrderRequest> requests) {
 
         List<Long> productIdList = requests.stream()
-            .map(request -> request.getProductId())
+            .map(ProductOrderRequest::getProductId)
             .distinct()
             .collect(Collectors.toList());
 
         // 중복된 상품이 요청된 경우
-        if (requests.size() != requests.size()) {
+        if (requests.size() != productIdList.size()) {
             throw new ProductDuplicateRequestException();
         }
 
@@ -77,7 +78,7 @@ public class ProductService {
             throw new ProductNotFoundException();
         }
 
-        List<Product> afterProductList = productList.stream().map(product -> {
+        List<Product> afterProductList = productList.stream().peek(product -> {
             ProductOrderRequest request = requests.stream()
                 .filter(req -> req.getProductId().equals(product.getProductId()))
                 .findAny().orElseThrow(ProductNotFoundException::new);
@@ -102,11 +103,15 @@ public class ProductService {
                 product.updateStatus(ProductStatus.SOLD_OUT);
             }
 
-            return product;
-
         }).collect(Collectors.toList());
 
-        productMapper.updateProducts(afterProductList);
+        int res = productMapper.updateProducts(afterProductList);
+
+        if (res != 1) {
+            throw new UserProcessException();
+        }
+
+        return productList;
     }
 
 }

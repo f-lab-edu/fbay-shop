@@ -43,7 +43,6 @@ public class ProductController {
     @PostMapping
     public ResponseEntity<ApiResponse> registProduct(@AuthUser UserInfo userInfo,
         @Valid @RequestBody ProductCreateRequest request) {
-
         return ApiResponse.created(productService.registProduct(userInfo.getId(), request).getProductId());
     }
 

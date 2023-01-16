@@ -23,7 +23,7 @@ public interface ProductMapper {
 
     List<Product> selectProductList(PageRequest request);
 
-    void updateProduct(Product product);
+    int updateProduct(Product product);
 
-    void updateProducts(List<Product> products);
+    int updateProducts(List<Product> products);
 }
