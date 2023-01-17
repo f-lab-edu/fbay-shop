@@ -105,11 +105,7 @@ public class ProductService {
 
         }).collect(Collectors.toList());
 
-        int res = productMapper.updateProducts(afterProductList);
-
-        if (res != 1) {
-            throw new UserProcessException();
-        }
+        productMapper.updateProducts(afterProductList);
 
         return productList;
     }
