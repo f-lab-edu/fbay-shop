@@ -1,6 +1,7 @@
 package com.flab.fbayshop.product.service;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -8,12 +9,14 @@ import org.springframework.transaction.annotation.Transactional;
 import com.flab.fbayshop.common.dto.request.PageRequest;
 import com.flab.fbayshop.product.dto.request.ProductCreateRequest;
 import com.flab.fbayshop.product.dto.request.ProductOrderRequest;
+import com.flab.fbayshop.product.exception.ProductDuplicateRequestException;
 import com.flab.fbayshop.product.exception.ProductNotFoundException;
 import com.flab.fbayshop.product.exception.ProductNotSaleException;
 import com.flab.fbayshop.product.exception.ProductOutOfStockException;
 import com.flab.fbayshop.product.mapper.ProductMapper;
 import com.flab.fbayshop.product.model.Product;
 import com.flab.fbayshop.product.model.ProductStatus;
+import com.flab.fbayshop.user.exception.UserProcessException;
 import com.flab.fbayshop.user.model.User;
 import com.flab.fbayshop.user.service.UserService;
 
@@ -56,34 +59,55 @@ public class ProductService {
     }
 
     @Transactional
-    public void decreaseStock(ProductOrderRequest request) {
+    public List<Product> decreaseStock(List<ProductOrderRequest> requests) {
 
-        Product product = productMapper.findProductByIdForUpdate(request.getProductId())
-            .orElseThrow(ProductNotFoundException::new);
+        List<Long> productIdList = requests.stream()
+            .map(ProductOrderRequest::getProductId)
+            .distinct()
+            .collect(Collectors.toList());
 
-        if (!ProductStatus.SALE.equals(product.getProductStatus())) {
-            throw new ProductNotSaleException();
+        // 중복된 상품이 요청된 경우
+        if (requests.size() != productIdList.size()) {
+            throw new ProductDuplicateRequestException();
         }
 
-        int quantity = request.getQuantity();
+        List<Product> productList = productMapper.findProductsByIdsForUpdate(productIdList);
 
-        if (quantity <= 0) {
-            throw new ProductOutOfStockException();
+        // 주문요청 상품리스트 개수와 조회된 상품리스트 개수가 다른 경우
+        if (productList == null || productList.size() != requests.size()) {
+            throw new ProductNotFoundException();
         }
 
-        int stock = product.getStock();
+        List<Product> afterProductList = productList.stream().peek(product -> {
+            ProductOrderRequest request = requests.stream()
+                .filter(req -> req.getProductId().equals(product.getProductId()))
+                .findAny().orElseThrow(ProductNotFoundException::new);
 
-        if (stock < quantity) {
-            throw new ProductOutOfStockException();
-        }
+            // 판매 중인 상품이 아닌 경우
+            if (!ProductStatus.SALE.equals(product.getProductStatus())) {
+                throw new ProductNotSaleException();
+            }
 
-        product.decreaseStock(quantity);
+            int quantity = request.getQuantity(); // 주문 수량
+            int stock = product.getStock(); // 상품 재고
 
-        if (product.getStock() <= 0) {
-            product.updateStatus(ProductStatus.SOLD_OUT);
-        }
+            // 재고가 부족한 경우
+            if (quantity <= 0 || stock < quantity) {
+                throw new ProductOutOfStockException();
+            }
 
-        productMapper.updateProduct(product);
+            product.decreaseStock(quantity);
+
+            // 재고가 떨어진 경우
+            if (product.getStock() <= 0) {
+                product.updateStatus(ProductStatus.SOLD_OUT);
+            }
+
+        }).collect(Collectors.toList());
+
+        productMapper.updateProducts(afterProductList);
+
+        return productList;
     }
 
 }

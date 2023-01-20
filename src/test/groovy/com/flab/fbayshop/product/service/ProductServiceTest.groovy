@@ -151,11 +151,11 @@ class ProductServiceTest extends Specification {
                 .stock(beforeStock)
                 .productStatus(ProductStatus.SALE)
                 .build()
-        productMapper.findProductByIdForUpdate(productId) >> Optional.ofNullable(product)
+        productMapper.findProductsByIdsForUpdate(_ as List) >> List.of(product)
         ProductOrderRequest request = new ProductOrderRequest(productId, 5)
 
         when:
-        productService.decreaseStock(request)
+        productService.decreaseStock(List.of(request))
 
         then:
         product.getProductStatus() == ProductStatus.SALE
@@ -171,11 +171,11 @@ class ProductServiceTest extends Specification {
                 .stock(beforeStock)
                 .productStatus(ProductStatus.SALE)
                 .build()
-        productMapper.findProductByIdForUpdate(productId) >> Optional.ofNullable(product)
+        productMapper.findProductsByIdsForUpdate(_ as List) >> List.of(product)
         ProductOrderRequest request = new ProductOrderRequest(productId, beforeStock)
 
         when:
-        productService.decreaseStock(request)
+        productService.decreaseStock(List.of(request))
 
         then:
         product.getProductStatus() == ProductStatus.SOLD_OUT
@@ -185,11 +185,11 @@ class ProductServiceTest extends Specification {
     def "상품 재고 감소 - 실패(상품정보 없음)"() {
         given:
         Long productId = 1L
-        productMapper.findProductByIdForUpdate(productId) >> Optional.ofNullable(null)
+        productMapper.findProductsByIdsForUpdate(_ as List) >> null
         ProductOrderRequest request = new ProductOrderRequest(productId, 1)
 
         when:
-        productService.decreaseStock(request)
+        productService.decreaseStock(List.of(request))
 
         then:
         thrown(ProductNotFoundException)
@@ -205,11 +205,11 @@ class ProductServiceTest extends Specification {
                 .stock(beforeStock)
                 .productStatus(ProductStatus.SALE)
                 .build()
-        productMapper.findProductByIdForUpdate(productId) >> Optional.ofNullable(product)
+        productMapper.findProductsByIdsForUpdate(_ as List) >> List.of(product)
         ProductOrderRequest request = new ProductOrderRequest(productId, orderStock)
 
         when:
-        productService.decreaseStock(request)
+        productService.decreaseStock(List.of(request))
 
         then:
         thrown(ProductOutOfStockException)
@@ -224,11 +224,11 @@ class ProductServiceTest extends Specification {
                 .stock(0)
                 .productStatus(ProductStatus.SOLD_OUT)
                 .build()
-        productMapper.findProductByIdForUpdate(productId) >> Optional.ofNullable(product)
+        productMapper.findProductsByIdsForUpdate(_ as List) >> List.of(product)
         ProductOrderRequest request = new ProductOrderRequest(productId, orderStock)
 
         when:
-        productService.decreaseStock(request)
+        productService.decreaseStock(List.of(request))
 
         then:
         thrown(ProductNotSaleException)

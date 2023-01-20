@@ -73,6 +73,21 @@
         FOR UPDATE
     </select>
 
+    <select id="findProductsByIdsForUpdate" resultType="com.flab.fbayshop.product.model.Product" parameterType="java.util.List">
+        SELECT
+            p.id AS productId
+             , p.price
+             , p.sell_price AS sellPrice
+             , p.stock
+             , p.product_status AS productStatus
+        FROM product AS p
+        WHERE p.id IN
+        <foreach collection="list" item="productId" open="(" separator="," close=")">
+            #{productId}
+        </foreach>
+        FOR UPDATE
+    </select>
+
     <select id="selectProductList" parameterType="com.flab.fbayshop.common.dto.request.PageRequest" resultMap="productMap">
         SELECT
               data.*
@@ -110,6 +125,15 @@
         SET stock          = #{stock}
           , product_status = #{productStatus}
         WHERE id = #{productId}
+    </update>
+
+    <update id="updateProducts" parameterType="java.util.List">
+        <foreach collection="list" item="product" separator=";">
+            UPDATE product
+            SET stock = #{product.stock}
+            , product_status = #{product.productStatus}
+            WHERE id = #{product.productId}
+        </foreach>
     </update>
 
 </mapper>

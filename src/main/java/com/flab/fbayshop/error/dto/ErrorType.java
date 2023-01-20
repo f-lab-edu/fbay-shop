@@ -23,9 +23,11 @@ public enum ErrorType {
     USER_DUPLICATED(HttpStatus.CONFLICT, 4111, "중복된 회원정보가 존재합니다."),
     USER_SIGNUP_FAIL(HttpStatus.CONFLICT, 4112, "회원가입에 실패하였습니다."),
     USER_MODIFY_FAIL(HttpStatus.CONFLICT, 4113, "회원정보 수정에 실패하였습니다."),
+    ADDRESS_NOT_FOUND(HttpStatus.NOT_FOUND, 4120, "등록된 주소가 없습니다."),
     PRODUCT_NOT_FOUND(HttpStatus.NOT_FOUND, 4200, "상품 정보가 존재하지 않습니다."),
     PRODUCT_NOT_SALE(HttpStatus.BAD_REQUEST, 4201, "구매 가능한 상품이 아닙니다."),
     PRODUCT_OUT_OF_STOCK(HttpStatus.BAD_REQUEST, 4202, "구매 가능한 수량이 초과되었습니다."),
+    PRODUCT_DUPLICATED_REQUEST(HttpStatus.BAD_REQUEST, 4203, "중복된 상품이 요청되었습니다."),
 
     /**
      * 서버 에러

@@ -2,6 +2,8 @@ package com.flab.fbayshop.user.service;
 
 import static com.flab.fbayshop.error.dto.ErrorType.*;
 
+import java.util.List;
+
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -10,10 +12,12 @@ import org.springframework.util.StringUtils;
 import com.flab.fbayshop.error.exception.InvalidParameterException;
 import com.flab.fbayshop.user.dto.request.UserModifyRequest;
 import com.flab.fbayshop.user.dto.request.UserSignupRequest;
+import com.flab.fbayshop.user.exception.AddressNotFoundException;
 import com.flab.fbayshop.user.exception.UserDuplicatedException;
 import com.flab.fbayshop.user.exception.UserNotFoundException;
 import com.flab.fbayshop.user.exception.UserProcessException;
 import com.flab.fbayshop.user.mapper.UserMapper;
+import com.flab.fbayshop.user.model.Address;
 import com.flab.fbayshop.user.model.User;
 
 import lombok.RequiredArgsConstructor;
@@ -80,5 +84,30 @@ public class UserService {
         }
         userMapper.deleteByEmail(email);
     }
+
+    @Transactional
+    public List<Address> selectAddressList(Long userId) {
+        return userMapper.selectAddressList(userId);
+    }
+
+    @Transactional
+    public Address findAddressById(Long addressId) {
+        return userMapper.findAddressById(addressId).orElseThrow(AddressNotFoundException::new);
+    }
+
+    @Transactional
+    public Address registAddress(Address address) {
+
+        userMapper.findById(address.getUserId()).orElseThrow(UserNotFoundException::new);
+
+        int res = userMapper.insertAddress(address);
+
+        if (res != 1) {
+            throw new UserProcessException();
+        }
+
+        return address;
+    }
+
 
 }

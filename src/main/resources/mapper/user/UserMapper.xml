@@ -6,7 +6,7 @@
 
     <select id="isExistsEmail" resultType="boolean">
         SELECT EXISTS
-            (SELECT email FROM user WHERE email = #{email} FOR SHARE)
+            (SELECT email FROM user WHERE email = #{email} FOR UPDATE)
     </select>
 
     <insert id="insertUser" parameterType="com.flab.fbayshop.user.model.User"
@@ -17,7 +17,7 @@
 
     <select id="findByEmail" parameterType="String" resultType="com.flab.fbayshop.user.model.User">
         SELECT
-              id
+              id AS user_id
             , email
             , password
             , nickname
@@ -30,7 +30,7 @@
 
     <select id="findById" parameterType="Long" resultType="com.flab.fbayshop.user.model.User">
         SELECT
-              id
+              id AS user_id
             , email
             , password
             , nickname
@@ -39,13 +39,6 @@
             , updated_at
         FROM user
         WHERE id = #{userId}
-    </select>
-
-    <select id="getCountByEmail" parameterType="String" resultType="Integer">
-        SELECT
-            COUNT(*)
-        FROM user
-        WHERE email = #{email}
     </select>
 
     <update id="updateUser" parameterType="com.flab.fbayshop.user.model.User">
@@ -62,4 +55,43 @@
         FROM user
         WHERE email = #{email}
     </delete>
+
+    <select id="findAddressById" parameterType="Long" resultType="com.flab.fbayshop.user.model.Address">
+        SELECT
+              id AS address_id
+            , user_id
+            , road_address
+            , jibun_address
+            , address_detail
+            , zone_code
+            , receiver_name
+            , receiver_contact
+            , created_at
+            , updated_at
+        FROM address
+        WHERE id = #{addressId}
+    </select>
+
+    <select id="selectAddressList" parameterType="Long" resultType="com.flab.fbayshop.user.model.Address">
+        SELECT
+              id AS address_id
+            , user_id
+            , road_address
+            , jibun_address
+            , address_detail
+            , zone_code
+            , receiver_name
+            , receiver_contact
+            , created_at
+            , updated_at
+        FROM address
+        WHERE user_id = #{userId}
+    </select>
+
+    <insert id="insertAddress" parameterType="com.flab.fbayshop.user.model.Address"
+            useGeneratedKeys="true" keyProperty="addressId">
+        INSERT INTO address (user_id, road_address, jibun_address, address_detail, zone_code, receiver_name, receiver_contact, created_at, updated_at)
+        VALUES (#{userId}, #{roadAddress}, #{jibunAddress}, #{addressDetail}, #{zoneCode}, #{receiverName}, #{receiverContact}, NOW(), NOW())
+    </insert>
+
 </mapper>
